@@ -1,0 +1,8 @@
+- title: Sample Test
+  input: 1 + 1
+  expected: 2
+  tags: [math, sample]
+- title: Another Test
+  input: 'hello'.toUpperCase()
+  expected: 'HELLO'
+  tags: [string]

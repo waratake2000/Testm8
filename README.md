@@ -1,4 +1,6 @@
-# Cursor Testcase Manager
+# 🧪 Cursor Testcase Manager
+
+![Testm8 Icon](resources/Testm8.png)
 
 Cursor Testcase Manager は、ワークスペース内の `testcases/*.yml` を読み込み、テストケースを一覧表示する VS Code / Cursor 用の拡張機能です。タイトルや入出力、タグ情報をテーブル表示し、クリックでソートやフィルタリングができます。
 
@@ -9,6 +11,14 @@ Cursor Testcase Manager は、ワークスペース内の `testcases/*.yml` を�
 - 拡張機能コマンド `Open Testcase Manager` で WebView を表示
 
 ## セットアップ
+
+### クイックセットアップ（推奨）
+```bash
+# 自動セットアップスクリプトを実行
+./setup.sh
+```
+
+### 手動セットアップ
 1. リポジトリをクローンし、依存関係をインストールします。
    ```bash
    npm install
@@ -17,6 +27,10 @@ Cursor Testcase Manager は、ワークスペース内の `testcases/*.yml` を�
    ```bash
    npm run compile
    ```
+
+**詳細な環境構築手順は [SETUP.md](./SETUP.md) を参照してください。**
+
+**実行手順は [EXECUTION_GUIDE.md](./EXECUTION_GUIDE.md) を参照してください。**
 
 ## Cursor での実行手順
 1. Cursor でこのフォルダを開きます。
@@ -37,9 +51,40 @@ Cursor Testcase Manager は、ワークスペース内の `testcases/*.yml` を�
   tags: [string]
 ```
 
+## 📁 プロジェクト構造
+
+```
+Testm8/
+├── src/                    # ソースコード
+│   └── extension.ts       # メインの拡張機能コード
+├── resources/              # リソースファイル
+│   └── Testm8.png        # メインアイコン
+├── testcases/             # テストケースファイル
+│   ├── example.yml       # 基本テストケース
+│   └── advanced.yml      # 高度なテストケース
+├── scripts/               # ユーティリティスクリプト
+│   └── prepare-icons.sh  # アイコン準備スクリプト
+├── dist/                  # コンパイル済みファイル
+├── .vscode/              # VS Code設定
+└── package.json          # プロジェクト設定
+```
+
 ## 開発メモ
 - 主要なソースコードは `src/extension.ts` にあります。
 - コンパイル済みファイルは `.gitignore` によりコミット対象外です。
+- リソースファイルは `resources/` ディレクトリに配置されています。
+
+## 🎨 アイコン
+
+このプロジェクトでは、美しいアイコンを使用しています：
+
+- **メインアイコン**: `resources/Testm8.png` - 拡張機能のメインアイコン
+- **アイコン準備**: `npm run prepare-icons` - 適切なサイズにリサイズ
+
+### アイコンサイズ
+- **128x128px**: `resources/icon-128.png` - VS Code拡張機能用
+- **256x256px**: `resources/icon-256.png` - 高解像度ディスプレイ用
+- **512x512px**: `resources/icon-512.png` - プレビュー用
 
 ## ライセンス
 MIT License

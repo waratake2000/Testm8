@@ -1,8 +1,39 @@
-- title: Sample Test
+- title: Basic Math Addition
   input: 1 + 1
   expected: 2
-  tags: [math, sample]
-- title: Another Test
+  tags: [math, basic, addition]
+
+- title: String Uppercase
   input: 'hello'.toUpperCase()
   expected: 'HELLO'
-  tags: [string]
+  tags: [string, uppercase]
+
+- title: Array Filter
+  input: [1, 2, 3, 4, 5].filter(x => x > 2)
+  expected: [3, 4, 5]
+  tags: [array, filter, functional]
+
+- title: Object Property Access
+  input: const obj = {name: 'John', age: 30}; obj.name
+  expected: 'John'
+  tags: [object, property]
+
+- title: Async Function
+  input: async function fetchData() { return await fetch('/api/data'); }
+  expected: Promise<Response>
+  tags: [async, promise, fetch]
+
+- title: Regular Expression
+  input: /^[a-zA-Z0-9]+$/.test('Hello123')
+  expected: true
+  tags: [regex, validation]
+
+- title: Date Formatting
+  input: new Date().toISOString()
+  expected: '2024-12-03T...'
+  tags: [date, formatting]
+
+- title: Error Handling
+  input: try { throw new Error('Test error'); } catch(e) { return e.message; }
+  expected: 'Test error'
+  tags: [error, handling]

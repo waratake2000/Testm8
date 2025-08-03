@@ -1,0 +1,39 @@
+- title: Complex Object Destructuring
+  input: const {name, age, ...rest} = {name: 'Alice', age: 25, city: 'Tokyo', country: 'Japan'}; rest
+  expected: {city: 'Tokyo', country: 'Japan'}
+  tags: [destructuring, object, advanced]
+
+- title: Promise Chain
+  input: Promise.resolve(5).then(x => x * 2).then(x => x + 3)
+  expected: Promise<13>
+  tags: [promise, chain, async]
+
+- title: Generator Function
+  input: function* fibonacci() { let [a, b] = [0, 1]; while(true) { yield a; [a, b] = [b, a + b]; } }
+  expected: Generator<number>
+  tags: [generator, fibonacci, advanced]
+
+- title: Class Definition
+  input: class Person { constructor(name) { this.name = name; } sayHello() { return `Hello, ${this.name}!`; } }
+  expected: class Person
+  tags: [class, oop, constructor]
+
+- title: Map Data Structure
+  input: const map = new Map([['key1', 'value1'], ['key2', 'value2']]); map.get('key1')
+  expected: 'value1'
+  tags: [map, data-structure, es6]
+
+- title: Set Operations
+  input: const set1 = new Set([1, 2, 3]); const set2 = new Set([2, 3, 4]); new Set([...set1, ...set2])
+  expected: Set {1, 2, 3, 4}
+  tags: [set, union, data-structure]
+
+- title: Template Literals
+  input: const name = 'World'; `Hello, ${name}!`
+  expected: 'Hello, World!'
+  tags: [template-literals, string, es6]
+
+- title: Arrow Function with Default Parameters
+  input: const greet = (name = 'Guest', greeting = 'Hello') => `${greeting}, ${name}!`
+  expected: function greet
+  tags: [arrow-function, default-params, es6] 

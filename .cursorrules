@@ -1,0 +1,330 @@
+# Cursor Testcase Manager - コーディングルール
+
+このファイルは、Cursor Testcase Managerプロジェクトの開発におけるコーディングルールとガイドラインを定義します。
+
+## 📋 プロジェクト概要
+
+### プロジェクト名
+Cursor Testcase Manager
+
+### 技術スタック
+- **言語**: TypeScript
+- **フレームワーク**: VS Code Extension API
+- **パッケージマネージャー**: npm
+- **ビルドツール**: TypeScript Compiler
+- **依存関係**: js-yaml, @types/vscode, @types/node
+
+### プロジェクト構造
+```
+Testm8/
+├── src/                    # ソースコード
+│   └── extension.ts       # メインの拡張機能コード
+├── resources/              # リソースファイル
+│   └── Testm8.png        # メインアイコン
+├── testcases/             # テストケースファイル
+│   ├── example.yml       # 基本テストケース
+│   └── advanced.yml      # 高度なテストケース
+├── scripts/               # ユーティリティスクリプト
+│   └── prepare-icons.sh  # アイコン準備スクリプト
+├── dist/                  # コンパイル済みファイル
+├── .vscode/              # VS Code設定
+└── package.json          # プロジェクト設定
+```
+
+## 🎯 コーディングルール
+
+### TypeScript
+
+#### 基本ルール
+- **TypeScript 5.0**を使用
+- **strict mode**を有効にする
+- **ES2020**ターゲットを使用
+- **CommonJS**モジュールシステムを使用
+
+#### 命名規則
+- **ファイル名**: `camelCase.ts` (例: `extension.ts`)
+- **クラス名**: `PascalCase` (例: `TestCaseManager`)
+- **インターフェース名**: `PascalCase` (例: `TestCase`)
+- **関数名**: `camelCase` (例: `loadTestcases`)
+- **変数名**: `camelCase` (例: `testcases`)
+- **定数名**: `UPPER_SNAKE_CASE` (例: `MAX_TESTCASES`)
+
+#### 型定義
+```typescript
+// インターフェースは必ず型定義を付ける
+interface TestCase {
+    title: string;
+    input: string;
+    expected: string;
+    tags?: string[];
+    file: string;
+}
+
+// 関数の戻り値型を明示する
+async function loadTestcases(): Promise<TestCase[]> {
+    // 実装
+}
+```
+
+#### コメント規則
+```typescript
+/**
+ * 関数のJSDocコメント
+ * 
+ * 関数の目的と動作を説明します。
+ * 
+ * @param param1 パラメータの説明
+ * @param param2 パラメータの説明
+ * @returns 戻り値の説明
+ */
+function exampleFunction(param1: string, param2: number): boolean {
+    // インラインコメントは処理の説明に使用
+    const result = param1.length > param2;
+    return result;
+}
+```
+
+### VS Code Extension API
+
+#### 基本パターン
+```typescript
+// 拡張機能のアクティベーション
+export function activate(context: vscode.ExtensionContext) {
+    // コマンドの登録
+    const disposable = vscode.commands.registerCommand('command.id', async () => {
+        // コマンドの実装
+    });
+    
+    // クリーンアップの登録
+    context.subscriptions.push(disposable);
+}
+
+// 非アクティベーション
+export function deactivate() {
+    // クリーンアップ処理
+}
+```
+
+#### WebView使用規則
+```typescript
+// WebViewパネルの作成
+const panel = vscode.window.createWebviewPanel(
+    'uniqueId',           // ユニークなID
+    'Panel Title',        // パネルのタイトル
+    vscode.ViewColumn.One, // 表示列
+    { enableScripts: true } // オプション
+);
+
+// HTMLコンテンツの設定
+panel.webview.html = getWebviewContent(webview, context.extensionUri, data);
+```
+
+### セキュリティ
+
+#### HTMLエスケープ
+```typescript
+/**
+ * HTMLエスケープ関数
+ * XSS攻撃を防ぐため、危険な文字をHTMLエンティティに変換
+ */
+function escapeHtml(unsafe: string): string {
+    return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+```
+
+#### ファイル読み込み
+```typescript
+// 非同期ファイル読み込み
+try {
+    const content = await fs.promises.readFile(filePath, 'utf8');
+    // 処理
+} catch (err) {
+    console.error('Failed to load file:', filePath, err);
+    // エラーハンドリング
+}
+```
+
+### エラーハンドリング
+
+#### 基本パターン
+```typescript
+// try-catch文の使用
+try {
+    // 危険な処理
+    const data = await loadData();
+    return processData(data);
+} catch (err) {
+    // エラーログの出力
+    console.error('Error occurred:', err);
+    // ユーザーへの通知
+    vscode.window.showErrorMessage('Failed to load data');
+    return null;
+}
+```
+
+#### デバッグログ
+```typescript
+// デバッグ情報の出力
+console.log('Workspace root:', workspaceFolder.uri.fsPath);
+console.log('Found files:', files.map(f => f.fsPath));
+```
+
+## 📁 ファイル構成ルール
+
+### ディレクトリ構造
+- **src/**: TypeScriptソースコード
+- **resources/**: 画像、アイコン、その他のリソース
+- **testcases/**: YAMLテストケースファイル
+- **scripts/**: ユーティリティスクリプト
+- **dist/**: コンパイル済みファイル（gitignore対象）
+- **.vscode/**: VS Code設定ファイル
+
+### ファイル命名
+- **TypeScript**: `camelCase.ts`
+- **YAML**: `kebab-case.yml`
+- **Shell Script**: `kebab-case.sh`
+- **Markdown**: `UPPER_SNAKE_CASE.md`
+
+### 設定ファイル
+- **package.json**: プロジェクト設定と依存関係
+- **tsconfig.json**: TypeScript設定
+- **.vscode/launch.json**: デバッグ設定
+- **.vscode/tasks.json**: タスク設定
+
+## 🎨 UI/UXガイドライン
+
+### WebViewデザイン
+- **VS Codeテーマ変数**を使用
+- **レスポンシブデザイン**を実装
+- **アクセシビリティ**を考慮
+- **モダンなUI**を採用
+
+### CSS規則
+```css
+/* VS Codeテーマ変数の使用 */
+body {
+    background: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    /* モバイル対応スタイル */
+}
+```
+
+### JavaScript機能
+```javascript
+// イベントリスナーの使用
+element.addEventListener('click', (event) => {
+    // イベント処理
+});
+
+// リアルタイム更新
+input.addEventListener('input', (event) => {
+    // リアルタイム処理
+});
+```
+
+## 📝 ドキュメント規則
+
+### Markdownファイル
+- **README.md**: プロジェクト概要
+- **SETUP.md**: 環境構築ガイド
+- **EXECUTION_GUIDE.md**: 実行ガイド
+
+### コメントスタイル
+```markdown
+# メインタイトル
+
+## セクションタイトル
+
+### サブセクション
+
+- リストアイテム
+- リストアイテム
+
+```code
+コードブロック
+```
+```
+
+### 絵文字の使用
+- 🧪 テスト関連
+- 📁 ファイル・ディレクトリ
+- 🎨 UI・デザイン
+- 🚀 実行・起動
+- ✅ 完了・成功
+- ❌ エラー・失敗
+- ⚠️ 警告・注意
+
+## 🔧 開発ワークフロー
+
+### 開発環境
+1. **Node.js** (v16.0.0以上)
+2. **npm** (v8.0.0以上)
+3. **Cursor** または **VS Code**
+
+### 開発コマンド
+```bash
+# 依存関係のインストール
+npm install
+
+# TypeScriptのコンパイル
+npm run compile
+
+# ファイル変更の監視
+npm run watch
+
+# アイコンの準備
+npm run prepare-icons
+
+# テスト実行（将来実装予定）
+npm test
+```
+
+### デバッグ実行
+1. **F5キー**を押す
+2. **"Run Extension"**を選択
+3. 新しいウィンドウで拡張機能をテスト
+
+### コード品質
+- **TypeScript strict mode**を有効
+- **ESLint**の使用を推奨（将来実装）
+- **Prettier**の使用を推奨（将来実装）
+
+## 🚀 デプロイメント
+
+### パッケージ化
+```bash
+# vsceを使用してパッケージ化
+npm install -g vsce
+vsce package
+```
+
+### マーケットプレイス公開
+1. **publisher**アカウントの作成
+2. **Personal Access Token**の取得
+3. **vsce publish**で公開
+
+## 📚 参考資料
+
+### 公式ドキュメント
+- [VS Code Extension API](https://code.visualstudio.com/api)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [js-yaml Documentation](https://github.com/nodeca/js-yaml)
+
+### ベストプラクティス
+- [VS Code Extension Best Practices](https://code.visualstudio.com/api/extension-guides/webview)
+- [TypeScript Best Practices](https://www.typescriptlang.org/docs/handbook/intro.html)
+
+---
+
+**作成日**: 2024年12月
+**バージョン**: 1.0.0
+**更新日**: 2024年12月 

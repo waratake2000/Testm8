@@ -3,10 +3,14 @@
   "displayName": "Cursor Testcase Manager",
   "description": "Manage YAML testcases within the workspace and display them in a table",
   "version": "0.0.1",
+  "publisher": "cursor-testcase-manager",
+  "icon": "resources/Testm8.png",
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
     "onCommand:testcases.open"
   ],
@@ -22,9 +26,11 @@
   "scripts": {
     "compile": "tsc -p .",
     "watch": "tsc -watch -p .",
-    "test": "echo 'No tests yet'"
+    "test": "echo 'No tests yet'",
+    "prepare-icons": "./scripts/prepare-icons.sh"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.85.0",
     "typescript": "^5.0.0"

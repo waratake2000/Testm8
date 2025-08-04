@@ -1,9 +1,9 @@
 {
-  "name": "cursor-testcase-manager",
-  "displayName": "Cursor Testcase Manager",
+  "name": "testm8",
+  "displayName": "Testm8",
   "description": "Manage YAML testcases within the workspace and display them in a table",
   "version": "0.0.1",
-  "publisher": "cursor-testcase-manager",
+  "publisher": "testm8",
   "icon": "resources/Testm8.png",
   "engines": {
     "vscode": "^1.85.0"
@@ -19,7 +19,7 @@
     "commands": [
       {
         "command": "testcases.open",
-        "title": "Open Testcase Manager"
+        "title": "Open Testm8"
       }
     ]
   },

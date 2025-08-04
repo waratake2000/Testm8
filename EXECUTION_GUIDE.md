@@ -1,8 +1,8 @@
-# 🧪 Cursor Testcase Manager - 実行ガイド
+# 🧪 Testm8 - 実行ガイド
 
 ![Testm8 Icon](resources/Testm8.png)
 
-このドキュメントでは、Cursor Testcase Manager拡張機能を実行するための詳細な手順を説明します。
+このドキュメントでは、Testm8拡張機能を実行するための詳細な手順を説明します。
 
 ## 📋 前提条件
 
@@ -53,14 +53,14 @@ Cursorが開いたら：
 新しいウィンドウで：
 
 1. **Ctrl+Shift+P** を押してコマンドパレットを開く
-2. **"Open Testcase Manager"** と入力
+2. **"Open Testm8"** と入力
 3. 表示されるコマンドを選択
 
 ### ステップ5: UIの確認
 
 拡張機能が正常に実行されると、以下のUIが表示されます：
 
-- 🧪 **ヘッダー**: "Testcase Manager" タイトル
+- 🧪 **ヘッダー**: "Testm8" タイトル
 - 📊 **統計情報**: "16 testcases, 48 tags"
 - 🔍 **検索ボックス**: "Search testcases by title..."
 - 📋 **テーブル**: 美しいコードブロックとタグバッジ

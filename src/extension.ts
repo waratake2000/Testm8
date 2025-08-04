@@ -1,5 +1,5 @@
 /**
- * Cursor Testcase Manager Extension
+ * Testm8 Extension
  * 
  * この拡張機能は、ワークスペース内のYAMLテストケースファイルを読み込み、
  * 美しいUIでテーブル表示するVS Code/Cursor用の拡張機能です。
@@ -10,7 +10,7 @@
  * - 検索・ソート・フィルタリング機能
  * - レスポンシブデザイン
  * 
- * @author Cursor Testcase Manager Team
+ * @author Testm8 Team
  * @version 1.0.0
  */
 
@@ -56,8 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
         // WebViewパネルを作成
         // これにより、美しいUIを表示するためのWebページが作成される
         const panel = vscode.window.createWebviewPanel(
-            'testcaseManager',        // パネルの識別子
-            'Testcase Manager',       // パネルのタイトル
+            'testm8',                 // パネルの識別子
+            'Testm8',                 // パネルのタイトル
             vscode.ViewColumn.One,    // 表示する列（最初の列）
             { enableScripts: true }   // JavaScriptを有効化（インタラクティブ機能のため）
         );
@@ -426,7 +426,7 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
     </head>
     <body>
         <div class="header">
-            <h1>🧪 Testcase Manager</h1>
+            <h1>🧪 Testm8</h1>
             <div class="stats">
                 <span>📁 ${testcases.length} testcases</span>
                 <span>🏷️ ${testcases.reduce((sum, tc) => sum + (tc.tags?.length || 0), 0)} tags</span>

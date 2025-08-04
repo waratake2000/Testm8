@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Cursor Testcase Manager - アイコン準備スクリプト
+# Testm8 - アイコン準備スクリプト
 # 拡張機能用のアイコンを適切なサイズにリサイズします
 
-echo "🧪 Cursor Testcase Manager - アイコン準備を開始します..."
+echo "🧪 Testm8 - アイコン準備を開始します..."
 
 # 必要なディレクトリを作成
 mkdir -p icons

@@ -26,14 +26,18 @@ import * as yaml from 'js-yaml';
  * 各テストケースはタイトル、入力、期待値、タグ、ファイル名を持ちます。
  */
 interface TestCase {
+    /** テストケースのキー */
+    key: string;
     /** テストケースのタイトル */
     title: string;
-    /** テストの入力値 */
-    input: string;
-    /** 期待される出力値 */
-    expected: string;
+    /** 種別 */
+    type: string;
+    /** 優先度 */
+    priority: string;
+    /** ステータス */
+    status: string;
     /** テストケースのタグ（オプション） */
-    tags?: string[];
+    tags: string[];
     /** テストケースが含まれるファイル名 */
     file: string;
 }
@@ -96,45 +100,60 @@ async function loadTestcases(): Promise<TestCase[]> {
         return result;
     }
     
-    // testcasesディレクトリ内のYAMLファイルを検索
-    // **/testcases/*.yml パターンで、サブディレクトリも含めて検索
-    const files = await vscode.workspace.findFiles('**/testcases/*.yml');
+    // testcasesディレクトリ内のYAML/Markdownファイルを検索
+    // **/testcases/*.{yml,yaml,md} パターンで、サブディレクトリも含めて検索
+    const files = await vscode.workspace.findFiles('**/testcases/*.{yml,yaml,md}');
     
     // デバッグ用ログ出力
     console.log('Workspace root:', workspaceFolder.uri.fsPath);
     console.log('Found files:', files.map(f => f.fsPath));
     
-    // 各YAMLファイルを処理
+    // 各ファイルを処理
     for (const uri of files) {
         try {
             // ファイルの内容をUTF-8で読み込み
             const content = await fs.promises.readFile(uri.fsPath, 'utf8');
-            
-            // YAMLをパース
-            const data = yaml.load(content);
-            
-            // データが配列の場合（複数のテストケース）
-            if (Array.isArray(data)) {
-                for (const item of data) {
+
+            const ext = path.extname(uri.fsPath).toLowerCase();
+
+            if (ext === '.md') {
+                // Markdown + Frontmatter の場合
+                const match = /^---\n([\s\S]*?)\n---/m.exec(content);
+                if (match) {
+                    const data: any = yaml.load(match[1]);
                     result.push({
-                        title: String(item.title ?? ''),                    // タイトル（デフォルト: 空文字）
-                        input: String(item.input ?? ''),                    // 入力（デフォルト: 空文字）
-                        expected: String(item.expected ?? ''),              // 期待値（デフォルト: 空文字）
-                        tags: Array.isArray(item.tags) ? item.tags.map(String) : [], // タグ（デフォルト: 空配列）
-                        file: path.basename(uri.fsPath)                     // ファイル名
+                        key: String(data?.key ?? ''),
+                        title: String(data?.title ?? ''),
+                        type: String(data?.type ?? ''),
+                        priority: String(data?.priority ?? ''),
+                        status: String(data?.status ?? ''),
+                        tags: Array.isArray(data?.tags) ? data.tags.map(String) : [],
+                        file: path.basename(uri.fsPath)
                     });
                 }
-            } 
-            // データがオブジェクトの場合（単一のテストケース）
-            else if (data && typeof data === 'object') {
-                const item: any = data;
-                result.push({
-                    title: String(item.title ?? ''),
-                    input: String(item.input ?? ''),
-                    expected: String(item.expected ?? ''),
-                    tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
-                    file: path.basename(uri.fsPath)
-                });
+            } else {
+                // YAML の場合
+                const data = yaml.load(content);
+
+                const pushItem = (item: any) => {
+                    result.push({
+                        key: String(item.key ?? ''),
+                        title: String(item.title ?? ''),
+                        type: String(item.type ?? ''),
+                        priority: String(item.priority ?? ''),
+                        status: String(item.status ?? ''),
+                        tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
+                        file: path.basename(uri.fsPath)
+                    });
+                };
+
+                if (Array.isArray(data)) {
+                    for (const item of data) {
+                        pushItem(item);
+                    }
+                } else if (data && typeof data === 'object') {
+                    pushItem(data);
+                }
             }
         } catch (err) {
             // ファイル読み込みエラーのログ出力
@@ -160,18 +179,16 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
     // テストケースのデータをHTMLテーブル行に変換
     const rows = testcases.map(tc => `
         <tr class="testcase-row">
+            <td>${escapeHtml(tc.key)}</td>
             <td class="title-cell">
                 <div class="title-content">
                     <span class="title-text">${escapeHtml(tc.title)}</span>
                     <div class="file-badge">${escapeHtml(tc.file)}</div>
                 </div>
             </td>
-            <td class="input-cell">
-                <code class="code-block">${escapeHtml(tc.input)}</code>
-            </td>
-            <td class="expected-cell">
-                <code class="code-block">${escapeHtml(tc.expected)}</code>
-            </td>
+            <td>${escapeHtml(tc.type)}</td>
+            <td>${escapeHtml(tc.priority)}</td>
+            <td>${escapeHtml(tc.status)}</td>
             <td class="tags-cell">
                 ${tc.tags?.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') || '<span class="no-tags">No tags</span>'}
             </td>
@@ -340,22 +357,7 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
                 width: fit-content;
             }
 
-            .input-cell, .expected-cell {
-                width: 25%;
-            }
-
-            .code-block {
-                background: var(--vscode-textCodeBlock-background);
-                padding: 8px 12px;
-                border-radius: 4px;
-                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-                font-size: 13px;
-                color: var(--vscode-textCodeBlock-foreground);
-                display: block;
-                white-space: pre-wrap;
-                word-break: break-word;
-                border: 1px solid var(--vscode-textCodeBlock-border);
-            }
+            /* removed input/expected specific styles */
 
             .tags-cell {
                 width: 25%;
@@ -442,10 +444,12 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
             <table id="table">
                 <thead>
                     <tr>
-                        <th class="sortable" data-col="0">Title</th>
-                        <th class="sortable" data-col="1">Input</th>
-                        <th class="sortable" data-col="2">Expected</th>
-                        <th class="sortable" data-col="3">Tags</th>
+                        <th class="sortable" data-col="0">Key</th>
+                        <th class="sortable" data-col="1">Title</th>
+                        <th class="sortable" data-col="2">Type</th>
+                        <th class="sortable" data-col="3">Priority</th>
+                        <th class="sortable" data-col="4">Status</th>
+                        <th class="sortable" data-col="5">Tags</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -455,7 +459,7 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
             ` : `
             <div class="empty-state">
                 <h3>📝 No testcases found</h3>
-                <p>Create YAML files in the <code>testcases/</code> directory to get started.</p>
+                <p>Create YAML or Markdown files in the <code>testcases/</code> directory to get started.</p>
             </div>
             `}
         </div>
@@ -518,31 +522,32 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, te
                     
                     // 各行をフィルタリング
                     rows.forEach(r => {
-                        const title = r.cells[0].textContent.toLowerCase();
-                        const input = r.cells[1].textContent.toLowerCase();
-                        const expected = r.cells[2].textContent.toLowerCase();
-                        const tags = r.cells[3].textContent.toLowerCase();
-                        
-                        // タイトル、入力、期待値、タグのいずれかに検索語が含まれるかチェック
-                        const matches = title.includes(val) || 
-                                      input.includes(val) || 
-                                      expected.includes(val) || 
+                        const key = r.cells[0].textContent.toLowerCase();
+                        const title = r.cells[1].textContent.toLowerCase();
+                        const type = r.cells[2].textContent.toLowerCase();
+                        const priority = r.cells[3].textContent.toLowerCase();
+                        const status = r.cells[4].textContent.toLowerCase();
+                        const tags = r.cells[5].textContent.toLowerCase();
+
+                        // 任意の列に検索語が含まれるかチェック
+                        const matches = key.includes(val) ||
+                                      title.includes(val) ||
+                                      type.includes(val) ||
+                                      priority.includes(val) ||
+                                      status.includes(val) ||
                                       tags.includes(val);
-                        
+
                         // マッチする行のみ表示
                         r.style.display = matches ? '' : 'none';
                     });
-                    
+
                     // 統計情報をリアルタイム更新
                     const visibleRows = rows.filter(r => r.style.display !== 'none');
                     const stats = document.querySelector('.stats');
                     if (stats) {
                         stats.innerHTML = \`
                             <span>📁 \${visibleRows.length} testcases</span>
-                            <span>🏷️ \${visibleRows.reduce((sum, r) => {
-                                const tagText = r.cells[3].textContent;
-                                return sum + (tagText.includes('No tags') ? 0 : tagText.split(',').length);
-                            }, 0)} tags</span>
+                            <span>🏷️ \${visibleRows.reduce((sum, r) => sum + r.cells[5].querySelectorAll('.tag').length, 0)} tags</span>
                         \`;
                     }
                 });
